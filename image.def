@@ -16,8 +16,6 @@ From: python:3.12-slim
     rm packages-microsoft-prod.deb
     apt update
 
-    apt install -y dotnet-sdk-10.0
-
     curl -sS https://starship.rs/install.sh | sh -s -- -y
 
 
@@ -32,6 +30,11 @@ From: python:3.12-slim
     uv init
     uv add jupyter notebook
 
+    apt install -y dotnet-sdk-10.0
+    dotnet tool install -g Microsoft.dotnet-interactive --add-source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json
+    cp /root/.dotnet/tools/dotnet-interactive /usr/local/bin/dotnet-interactive
+    cp -r /root/.dotnet/tools/.store /usr/local/bin/.store
+    dotnet interactive jupyter install
 
 %environment
     export SHELL=/bin/bash
