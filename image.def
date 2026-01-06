@@ -44,6 +44,9 @@ From: python:3.12-slim
     mkdir -p /usr/local/share/jupyter/kernels
     dotnet interactive jupyter install --path /usr/local/share/jupyter/kernels
 
+    # 仮想環境の構築
+    uv add jupyter notebook
+
 %environment
     export SHELL=/bin/bash
     # dotnet-interactive が .store を見つけられるようにパスを通す（必要に応じて）

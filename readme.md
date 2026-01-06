@@ -1,19 +1,22 @@
 # jupyter-dotnet
 
-Singularity を使用した Jupyter Notebook 実行環境です。
-[uv](https://github.com/astral.sh/uv) を使用して、高速かつ再現可能な Python パッケージ管理を実現しています。
+.NET Interactive に対応した、Singularity ベースの Jupyter Notebook 実行環境です。
+Python の高速パッケージマネージャー [uv](https://github.com/astral.sh/uv) も統合しており、Python と .NET (C#, F#) の両方を単一のノートブックで利用できます。
 
 ## 構成
 
-- **Base Image**: Python 3.12 (slim)
-- **Package Manager**: [uv](https://github.com/astral-sh/uv)
-- **Interactive**: Jupyter Notebook / Shell
+- **Base Image**: `python:3.12-slim`
+- **.NET SDK**: `.NET 10.0`
+- **Python Package Manager**: `uv`
+- **Interactive Environment**: Jupyter Notebook with `.NET Interactive`
+- **Shell**: `bash` with `starship` prompt
 
 ## 特徴
 
+- **Polyglot Notebook**: C#, F#, PowerShell, Python などを単一のノートブック上で利用可能。
 - **Singularity/Apptainer**: ホスト OS を汚さず、ポータブルな実行環境を提供。
+- **.NET 10**: 最新の .NET 環境をコンテナ内に構築。
 - **uv**: Python パッケージのインストールと管理を高速化。
-- **Jupyter Notebook**: 最先端のデータ分析環境を即座に利用可能。
 - **Rich Console**: `starship` プロンプトを統合した、モダンで視認性の高いシェル環境。
 
 ## ディレクトリ構成
@@ -49,22 +52,23 @@ make run
 
 ```bash
 cd /apps
-uv run jupyter notebook --ip 0.0.0.0 --no-browser
+jupyter notebook --ip 0.0.0.0 --no-browser
 ```
 
 ターミナルに表示される URL (例: `http://127.0.0.1:8888/?token=...`) にブラウザからアクセスしてください。
+ノートブックを新規作成する際に、カーネルとして `.NET (C#)` や `.NET (F#)` などを選択できます。
 
 ### 4. パッケージの追加・変更
 
 このプロジェクトでは、環境の再現性を保つためにイメージの再ビルドを推奨しています。
 
-1. `image.def` の `%post` セクションを編集し、`uv add` コマンドなどを追加します。
+1. `image.def` の `%post` セクションを編集し、`uv pip install` や `dotnet tool install` コマンドなどを追加します。
 2. 再度 `make build` を実行してイメージを更新します。
 
 ## 開発のヒント
 
 - **データの永続化**: `notebooks/` ディレクトリ配下のファイルはホスト OS と共有されるため、コンテナを終了しても消えることはありません。
-- **カスタム設定**: `rich_console` が有効な場合、`container_bashrc` を編集することでコンテナ内のエイリアスなどをカスタマイズできます。
+- **カスタム設定**: `container_bashrc` を編集することでコンテナ内のエイリアスなどをカスタマイズできます。
 
 ## ライセンス
 
