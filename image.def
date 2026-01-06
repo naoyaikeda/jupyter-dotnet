@@ -7,35 +7,44 @@ From: python:3.12-slim
 %post
     apt update
     apt upgrade -y
-    apt install curl -y
-    apt install git -y
-    apt install wget -y
+    apt install curl git wget -y
 
+    # .NET 10 リポジトリ設定
     wget https://packages.microsoft.com/config/debian/12/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
     dpkg -i packages-microsoft-prod.deb
     rm packages-microsoft-prod.deb
     apt update
 
+    # Starship & uv のインストール
     curl -sS https://starship.rs/install.sh | sh -s -- -y
-
-
     curl -LsSf https://astral.sh/uv/install.sh | sh
-
     cp /root/.local/bin/uv /usr/local/bin/uv
     chmod +x /usr/local/bin/uv
 
+    # /apps の準備
     chmod 777 /apps
     cd /apps
 
+    #  uv 仮想環境の初期化
     uv init
-    uv add jupyter notebook
 
+    # uv で jupyter をインストール
+    # --system を使うことで、仮想環境ではなくコンテナの python 環境に直接入れます
+    uv pip install --system jupyter notebook
+
+    # .NET SDK 10 & .NET Interactive のインストール
     apt install -y dotnet-sdk-10.0
     dotnet tool install -g Microsoft.dotnet-interactive --add-source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json
+
+    # バイナリの移動
     cp /root/.dotnet/tools/dotnet-interactive /usr/local/bin/dotnet-interactive
     cp -r /root/.dotnet/tools/.store /usr/local/bin/.store
-    dotnet interactive jupyter install
+
+    # 【重要】Jupyter カーネルのディレクトリを強制作成し、パスを指定してインストール
+    mkdir -p /usr/local/share/jupyter/kernels
+    dotnet interactive jupyter install --path /usr/local/share/jupyter/kernels
 
 %environment
     export SHELL=/bin/bash
-
+    # dotnet-interactive が .store を見つけられるようにパスを通す（必要に応じて）
+    export PATH="/usr/local/bin:$PATH"
